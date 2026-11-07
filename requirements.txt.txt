@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+faster-whisper
+moviepy
+opencv-python
+mediapipe
+numpy
+google-generativeai
+python-multipart
+ffmpeg-python

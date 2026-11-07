@@ -1,0 +1,24 @@
+import ffmpeg
+
+def render_portrait_clip(video_path: str, start_sec: float, end_sec: float, center_x: int, output_path: str):
+    probe = ffmpeg.probe(video_path)
+    video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
+    
+    if not video_stream:
+        raise ValueError("Stream video tidak ditemukan dalam file!")
+        
+    orig_w = int(video_stream['width'])
+    orig_h = int(video_stream['height'])
+    
+    target_w = int(orig_h * (9 / 16))
+    crop_x = max(0, min(center_x - (target_w // 2), orig_w - target_w))
+    
+    (
+        ffmpeg
+        .input(video_path, ss=start_sec, to=end_sec)
+        .filter('crop', target_w, orig_h, crop_x, 0)
+        .filter('scale', 1080, 1920)
+        .output(output_path, vcodec='libx264', acodec='aac', video_bitrate='2M')
+        .overwrite_output()
+        .run(capture_stdout=True, capture_stderr=True)
+    )
